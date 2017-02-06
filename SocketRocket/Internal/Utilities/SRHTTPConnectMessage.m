@@ -24,6 +24,7 @@ static NSString *_SRHTTPConnectMessageHost(NSURL *url)
 
 CFHTTPMessageRef SRHTTPConnectMessageCreate(NSURLRequest *request,
                                             NSString *securityKey,
+                                            NSDictionary<NSString *, NSString *> * _Nullable additionalHeaders,
                                             uint8_t webSocketProtocolVersion,
                                             NSArray<NSHTTPCookie *> *_Nullable cookies,
                                             NSArray<NSString *> *_Nullable requestedProtocols)
@@ -55,6 +56,17 @@ CFHTTPMessageRef SRHTTPConnectMessageCreate(NSURLRequest *request,
     NSString *basicAuthorizationString = SRBasicAuthorizationHeaderFromURL(url);
     if (basicAuthorizationString) {
         CFHTTPMessageSetHeaderFieldValue(message, CFSTR("Authorization"), (__bridge CFStringRef)basicAuthorizationString);
+    }
+    
+    // Append any additional headers
+    if (additionalHeaders)
+    {
+        [additionalHeaders enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, NSString * _Nonnull obj, BOOL * _Nonnull stop) {
+            if (key.length && obj.length)
+            {
+                CFHTTPMessageSetHeaderFieldValue(message, (__bridge CFStringRef)key, (__bridge CFStringRef)obj);
+            }
+        }];
     }
 
     CFHTTPMessageSetHeaderFieldValue(message, CFSTR("Upgrade"), CFSTR("websocket"));

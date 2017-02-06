@@ -57,6 +57,11 @@ extern NSString *const SRWebSocketErrorDomain;
  */
 extern NSString *const SRHTTPResponseErrorKey;
 
+/**
+ Key used for HTTP headers if bad response was received from the server.
+ */
+extern NSString *const SRHTTPHeadersErrorKey;
+
 @protocol SRWebSocketDelegate;
 
 ///--------------------------------------
@@ -121,6 +126,11 @@ extern NSString *const SRHTTPResponseErrorKey;
  For DEBUG builds this flag is ignored, and SSL connections are allowed regardless of the certificate trust configuration
  */
 @property (nonatomic, assign, readonly) BOOL allowsUntrustedSSLCertificates;
+
+/**
+ Additional HTTP request headers to append for the protocol handshake.
+ */
+@property (nonatomic, strong) NSDictionary<NSString *, NSString *> *additionalHTTPHeaders;
 
 ///--------------------------------------
 #pragma mark - Constructors

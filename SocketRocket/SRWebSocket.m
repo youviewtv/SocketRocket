@@ -68,6 +68,7 @@ static uint8_t const SRWebSocketProtocolVersion = 13;
 
 NSString *const SRWebSocketErrorDomain = @"SRWebSocketErrorDomain";
 NSString *const SRHTTPResponseErrorKey = @"HTTPResponseStatusCode";
+NSString *const SRHTTPHeadersErrorKey = @"SRHTTPHeadersErrorKey";
 
 @interface SRWebSocket ()  <NSStreamDelegate>
 
@@ -373,8 +374,13 @@ NSString *const SRHTTPResponseErrorKey = @"HTTPResponseStatusCode";
 {
     NSInteger responseCode = CFHTTPMessageGetResponseStatusCode(_receivedHTTPHeaders);
     if (responseCode >= 400) {
+        
+        NSDictionary *receivedHeaders = CFBridgingRelease(CFHTTPMessageCopyAllHeaderFields(_receivedHTTPHeaders));
+        
         SRDebugLog(@"Request failed with response code %d", responseCode);
-        NSError *error = SRHTTPErrorWithCodeDescription(responseCode, 2132,
+        NSError *error = SRHTTPErrorWithCodeDescription(responseCode,
+                                                        receivedHeaders,
+                                                        2132,
                                                         [NSString stringWithFormat:@"Received bad response code from server: %d.",
                                                          (int)responseCode]);
         [self _failWithError:error];
@@ -440,6 +446,7 @@ NSString *const SRHTTPResponseErrorKey = @"HTTPResponseStatusCode";
 
     CFHTTPMessageRef message = SRHTTPConnectMessageCreate(_urlRequest,
                                                           _secKey,
+                                                          self.additionalHTTPHeaders,
                                                           SRWebSocketProtocolVersion,
                                                           self.requestCookies,
                                                           _requestedProtocols);

@@ -15,6 +15,6 @@ extern NSError *SRErrorWithDomainCodeDescription(NSString *domain, NSInteger cod
 extern NSError *SRErrorWithCodeDescription(NSInteger code, NSString *description);
 extern NSError *SRErrorWithCodeDescriptionUnderlyingError(NSInteger code, NSString *description, NSError *underlyingError);
 
-extern NSError *SRHTTPErrorWithCodeDescription(NSInteger httpCode, NSInteger errorCode, NSString *description);
+extern NSError *SRHTTPErrorWithCodeDescription(NSInteger httpCode,  NSDictionary * _Nullable httpHeaders, NSInteger errorCode, NSString *description);
 
 NS_ASSUME_NONNULL_END

@@ -31,12 +31,18 @@ NSError *SRErrorWithCodeDescriptionUnderlyingError(NSInteger code, NSString *des
                                        NSUnderlyingErrorKey: underlyingError }];
 }
 
-NSError *SRHTTPErrorWithCodeDescription(NSInteger httpCode, NSInteger errorCode, NSString *description)
+NSError *SRHTTPErrorWithCodeDescription(NSInteger httpCode, NSDictionary * _Nullable httpHeaders, NSInteger errorCode, NSString *description)
 {
+    NSMutableDictionary *userInfo = @{NSLocalizedDescriptionKey: description,
+                                      SRHTTPResponseErrorKey: @(httpCode)}.mutableCopy;
+    if (httpHeaders)
+    {
+        userInfo[SRHTTPHeadersErrorKey] = httpHeaders;
+    }
+    
     return [NSError errorWithDomain:SRWebSocketErrorDomain
                                code:errorCode
-                           userInfo:@{ NSLocalizedDescriptionKey: description,
-                                       SRHTTPResponseErrorKey: @(httpCode) }];
+                           userInfo:userInfo];
 }
 
 NS_ASSUME_NONNULL_END

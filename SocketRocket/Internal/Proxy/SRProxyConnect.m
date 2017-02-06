@@ -121,7 +121,8 @@
 {
     SRDebugLog(@"_failWithError, return error");
     if (!error) {
-        error = SRHTTPErrorWithCodeDescription(500, 2132,@"Proxy Error");
+        NSDictionary *receivedHeaders = CFBridgingRelease(CFHTTPMessageCopyAllHeaderFields(_receivedHTTPHeaders));
+        error = SRHTTPErrorWithCodeDescription(500, receivedHeaders, 2132,@"Proxy Error");
     }
 
     if (_receivedHTTPHeaders) {
@@ -438,7 +439,8 @@
 
     if (responseCode >= 299) {
         SRDebugLog(@"Connect to Proxy Request failed with response code %d", responseCode);
-        NSError *error = SRHTTPErrorWithCodeDescription(responseCode, 2132,
+        NSDictionary *receivedHeaders = CFBridgingRelease(CFHTTPMessageCopyAllHeaderFields(_receivedHTTPHeaders));
+        NSError *error = SRHTTPErrorWithCodeDescription(responseCode, receivedHeaders, 2132,
                                                         [NSString stringWithFormat:@"Received bad response code from proxy server: %d.",
                                                          (int)responseCode]);
         [self _failWithError:error];
@@ -468,7 +470,8 @@ static NSTimeInterval const SRProxyConnectWriteTimeout = 5.0;
             usleep(100); //wait until the socket is ready
             timeout -= 100;
             if (timeout < 0) {
-                NSError *error = SRHTTPErrorWithCodeDescription(408, 2132, @"Proxy timeout");
+                NSDictionary *receivedHeaders = CFBridgingRelease(CFHTTPMessageCopyAllHeaderFields(_receivedHTTPHeaders));
+                NSError *error = SRHTTPErrorWithCodeDescription(408, receivedHeaders, 2132, @"Proxy timeout");
                 [sself _failWithError:error];
             } else if (outStream.streamError != nil) {
                 [sself _failWithError:outStream.streamError];
